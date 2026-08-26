@@ -1,0 +1,42 @@
+# --- Variables de entorno / secretos ---
+.env
+.env.local
+.env.*.local
+
+# --- Dependencias ---
+node_modules/
+
+# --- Prisma ---
+# Los binarios generados de Prisma no deben subirse; se regeneran con
+# `npx prisma generate` en cada máquina.
+generated/
+prisma/migrations/dev.db
+
+# --- Logs ---
+*.log
+npm-debug.log*
+logs/
+
+# --- Archivos del sistema operativo ---
+.DS_Store
+Thumbs.db
+
+# --- Editores ---
+.vscode/
+.idea/
+*.swp
+
+# --- Claude Code (personal, no se comparte con el equipo) ---
+.claude/settings.local.json
+
+# --- Cobertura de pruebas ---
+coverage/
+
+# --- Build / dist (si en algún momento compilan TypeScript) ---
+dist/
+build/
+
+# --- Archivos temporales de subida (OCR, facturas escaneadas de prueba) ---
+tmp/
+uploads/*
+!uploads/.gitkeep
