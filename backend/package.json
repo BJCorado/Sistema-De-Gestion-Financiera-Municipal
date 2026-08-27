@@ -1,0 +1,21 @@
+{
+  "name": "sigefi-backend",
+  "version": "1.0.0",
+  "description": "SIGEFI - Backend (Node.js + Express + Prisma)",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node src/index.js",
+    "test": "jest",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.20.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "prisma": "^5.20.0"
+  }
+}
