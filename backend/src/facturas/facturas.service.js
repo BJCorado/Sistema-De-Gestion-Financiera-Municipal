@@ -1,6 +1,5 @@
 // src/facturas/facturas.service.js
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../lib/prisma");
 
 // Constante institucional — nunca se toma del body (ver comentario del schema).
 const RECEPTOR = {
