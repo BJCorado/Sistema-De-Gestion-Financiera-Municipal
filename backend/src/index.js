@@ -2,11 +2,13 @@
 require("dotenv").config();
 const express = require("express");
 const facturasRoutes = require("./facturas/facturas.routes");
+const proveedoresRoutes = require("./proveedores/proveedores.routes");
 
 const app = express();
 app.use(express.json());
 
 app.use("/api/v1/facturas", facturasRoutes);
+app.use("/api/v1/proveedores", proveedoresRoutes);
 
 app.get("/api/v1/health", (req, res) => res.json({ ok: true }));
 
