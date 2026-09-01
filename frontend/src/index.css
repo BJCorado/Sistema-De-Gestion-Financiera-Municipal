@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sigefi-blue-50: #edf4ff;
+  --color-sigefi-blue-100: #dbeafe;
+  --color-sigefi-blue-700: #0756b7;
+  --color-sigefi-blue-800: #064595;
+  --color-sigefi-blue-900: #073774;
+  --color-sigefi-blue-950: #062958;
+  --color-sigefi-yellow: #f4d30f;
+  --color-sigefi-green: #16823b;
+  --color-sigefi-green-dark: #10652e;
+  --color-sigefi-red: #c93636;
+  --color-sigefi-surface: #f4f6f9;
+}
+
+:root {
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: #1e293b;
+  background: #f4f6f9;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a {
+  cursor: pointer;
+}
+
+@layer components {
+  .panel {
+    @apply rounded-lg border border-slate-200 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)];
+  }
+
+  .btn-secondary {
+    @apply inline-flex min-h-10 items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-sigefi-blue-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sigefi-blue-800 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-success {
+    @apply inline-flex min-h-10 items-center justify-center rounded-md bg-sigefi-green px-4 py-2 text-sm font-semibold text-white transition hover:bg-sigefi-green-dark disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-danger {
+    @apply inline-flex min-h-10 items-center justify-center rounded-md bg-sigefi-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .form-label {
+    @apply mb-1.5 block text-sm font-semibold text-slate-700;
+  }
+
+  .form-control {
+    @apply block min-h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-sigefi-blue-700 focus:ring-2 focus:ring-sigefi-blue-100 disabled:cursor-not-allowed disabled:opacity-80;
+  }
+
+  .form-control-error {
+    @apply border-sigefi-red focus:border-sigefi-red focus:ring-red-100;
+  }
+
+  .field-error {
+    @apply mt-1.5 block text-xs font-medium text-sigefi-red;
+  }
+
+  .table-action {
+    @apply rounded px-2 py-1.5 text-xs font-semibold text-sigefi-blue-700 transition hover:bg-sigefi-blue-50 hover:text-sigefi-blue-900;
+  }
+
+  .table-action-danger {
+    @apply rounded px-2 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-50 hover:text-red-800;
+  }
+
+  .table-action-success {
+    @apply rounded px-2 py-1.5 text-xs font-semibold text-green-700 transition hover:bg-green-50 hover:text-green-800;
+  }
+
+  .pagination-button {
+    @apply min-h-9 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-45;
+  }
+
+  .pagination-number {
+    @apply grid size-9 place-items-center rounded-md border border-slate-300 bg-white text-xs font-semibold text-slate-700 transition hover:bg-slate-50;
+  }
+
+  .pagination-number-active {
+    @apply border-sigefi-blue-700 bg-sigefi-blue-700 text-white hover:bg-sigefi-blue-800;
+  }
+}
