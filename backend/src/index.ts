@@ -2,12 +2,7 @@
 import "dotenv/config";
 import express, { Request, Response } from "express";
 import proveedoresRoutes from "./proveedores/proveedores.routes";
-
-// TODO: facturas sigue en JavaScript. Cuando Javier migre el módulo,
-// reemplazar este require por: import facturasRoutes from "./facturas/facturas.routes";
-// y quitar allowJs/checkJs del tsconfig.json.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const facturasRoutes = require("./facturas/facturas.routes");
+import facturasRoutes from "./facturas/facturas.routes";
 
 const app = express();
 app.use(express.json());
