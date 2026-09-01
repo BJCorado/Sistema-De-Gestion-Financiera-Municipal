@@ -1,8 +1,8 @@
-// src/proveedores/proveedores.routes.js
-const express = require("express");
-const controlador = require("./proveedores.controller");
+// src/proveedores/proveedores.routes.ts
+import { Router } from "express";
+import * as controlador from "./proveedores.controller";
 
-const router = express.Router();
+const router = Router();
 
 // Rutas y roles según contrato 3.2, sección Proveedores.
 router.get("/", controlador.listar);
@@ -11,6 +11,6 @@ router.post("/", controlador.crear);
 router.put("/:id", controlador.actualizar);
 router.patch("/:id/estado", controlador.cambiarEstado);
 
-// TODO: GET /proveedores/:id/estado-cuenta — HU-12, rol administracion.
+// TODO (ficha 8.2, Wayner): GET /proveedores/:id/estado-cuenta — HU-12, rol administracion.
 
-module.exports = router;
+export default router;

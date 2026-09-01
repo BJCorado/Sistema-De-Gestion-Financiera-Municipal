@@ -1,13 +1,19 @@
-// src/proveedores/proveedores.service.test.js
-const {
+// src/proveedores/proveedores.service.test.ts
+import {
   validarCreacion,
   validarActualizacion,
   validarFiltros,
   verificarAlcance,
   ErrorNegocio,
-} = require("./proveedores.service");
+} from "./proveedores.service";
 
 const base = { nombre: "Ferretería El Progreso", nit: "1234567-8", tipo: "bien" };
+
+/** En los catch, TypeScript entrega `unknown`: esto lo estrecha a ErrorNegocio. */
+function comoErrorNegocio(e: unknown): ErrorNegocio {
+  if (!(e instanceof ErrorNegocio)) throw e;
+  return e;
+}
 
 describe("Proveedores — validaciones (tarea 5.1)", () => {
   test("acepta un proveedor válido y normaliza los campos", () => {
@@ -22,8 +28,9 @@ describe("Proveedores — validaciones (tarea 5.1)", () => {
     try {
       validarCreacion({ nombre: base.nombre, nit: base.nit });
     } catch (e) {
-      expect(e).toBeInstanceOf(ErrorNegocio);
-      expect(e.errores.some((x) => x.campo === "tipo")).toBe(true);
+      const error = comoErrorNegocio(e);
+      expect(error).toBeInstanceOf(ErrorNegocio);
+      expect(error.errores?.some((x) => x.campo === "tipo")).toBe(true);
     }
   });
 
@@ -32,7 +39,7 @@ describe("Proveedores — validaciones (tarea 5.1)", () => {
     try {
       validarCreacion({ ...base, nit: "abc" });
     } catch (e) {
-      expect(e.errores.some((x) => x.campo === "nit")).toBe(true);
+      expect(comoErrorNegocio(e).errores?.some((x) => x.campo === "nit")).toBe(true);
     }
   });
 
@@ -41,7 +48,7 @@ describe("Proveedores — validaciones (tarea 5.1)", () => {
     try {
       validarActualizacion({ tipo: "servicio" });
     } catch (e) {
-      expect(e.errores.some((x) => x.campo === "tipo")).toBe(true);
+      expect(comoErrorNegocio(e).errores?.some((x) => x.campo === "tipo")).toBe(true);
     }
   });
 
@@ -49,7 +56,7 @@ describe("Proveedores — validaciones (tarea 5.1)", () => {
     expect(Object.keys(validarActualizacion({ telefono: "50221234" }))).toEqual(["telefono"]);
   });
 
-   test("RF-09: filtros con valores por defecto", () => {
+  test("RF-09: filtros con valores por defecto", () => {
     const filtros = validarFiltros({});
     expect(filtros.activo).toBe(true);
     expect(filtros.page).toBe(1);
@@ -60,16 +67,16 @@ describe("Proveedores — validaciones (tarea 5.1)", () => {
     expect(validarFiltros({ activo: "todos" }).activo).toBeNull();
   });
 
-   test("el límite no puede pasar de 100", () => {
+  test("el límite no puede pasar de 100", () => {
     expect(validarFiltros({ limit: "500" }).limit).toBe(100);
   });
-  
+
   test("HU-13: Compras no puede ver un proveedor de servicio", () => {
     expect.assertions(1);
     try {
       verificarAlcance({ tipo: "servicio" }, "compras");
     } catch (e) {
-      expect(e.status).toBe(404);
+      expect(comoErrorNegocio(e).status).toBe(404);
     }
   });
 
