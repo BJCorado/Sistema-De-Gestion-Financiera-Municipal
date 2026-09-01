@@ -108,4 +108,16 @@ a {
   .pagination-number-active {
     @apply border-sigefi-blue-700 bg-sigefi-blue-700 text-white hover:bg-sigefi-blue-800;
   }
+
+  .status-badge {
+    @apply inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+
+  .readonly-value {
+    @apply min-h-10 rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm capitalize text-slate-700;
+  }
+
+  .section-title {
+    @apply text-base font-bold text-sigefi-blue-900;
+  }
 }

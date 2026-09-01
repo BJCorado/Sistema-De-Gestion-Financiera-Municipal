@@ -46,3 +46,17 @@ export function cambiarEstadoProveedor(id: number, activo: boolean) {
     body: JSON.stringify({ activo }),
   });
 }
+
+export async function listarTodosProveedores(activo: "true" | "false" | "todos" = "todos") {
+  const proveedores: Proveedor[] = [];
+  let page = 1;
+
+  while (true) {
+    const response = await listarProveedores({ activo, page, limit: 100 });
+    proveedores.push(...response.data);
+    if (proveedores.length >= response.total || response.data.length === 0) break;
+    page += 1;
+  }
+
+  return proveedores;
+}

@@ -58,7 +58,9 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
     const errorBody = body as ApiErrorBody | null;
     throw new ApiError(
       response.status,
-      errorBody?.error || DEFAULT_MESSAGES[response.status] || "No fue posible completar la solicitud.",
+      (response.status < 500 ? errorBody?.error : undefined) ||
+        DEFAULT_MESSAGES[response.status] ||
+        "No fue posible completar la solicitud.",
       Array.isArray(errorBody?.detalles) ? errorBody.detalles : [],
     );
   }
