@@ -1,5 +1,5 @@
-// src/facturas/facturas.service.test.js
-const { calcularSemaforo } = require("./facturas.service");
+// src/facturas/facturas.service.test.ts
+import { calcularSemaforo } from "./facturas.service";
 
 describe("calcularSemaforo (HU-05)", () => {
   test("más de 30 días restantes -> verde", () => {
