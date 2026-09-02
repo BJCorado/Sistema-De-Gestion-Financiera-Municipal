@@ -1,12 +1,14 @@
 // src/index.ts
 import "dotenv/config";
 import express, { Request, Response } from "express";
-import proveedoresRoutes from "./proveedores/proveedores.routes";
+import authRoutes from "./auth/auth.routes";
 import facturasRoutes from "./facturas/facturas.routes";
+import proveedoresRoutes from "./proveedores/proveedores.routes";
 
 const app = express();
 app.use(express.json());
 
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/facturas", facturasRoutes);
 app.use("/api/v1/proveedores", proveedoresRoutes);
 
