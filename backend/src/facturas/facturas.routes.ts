@@ -1,24 +1,16 @@
 // src/facturas/facturas.routes.ts
-import { Router, Request, Response, NextFunction } from "express";
-import { RolUsuario } from "@prisma/client";
+import { Router } from "express";
 import * as controller from "./facturas.controller";
+import { autenticar, permitirRoles } from "../middlewares/auth.middleware";
 
 const router = Router();
 
-const USUARIO_PRUEBA_ID = 1;
+// Contrato 3.2: todas las rutas exigen JWT salvo /auth/login.
+router.use(autenticar);
 
-const requireAuth = (req: Request, _res: Response, next: NextFunction): void => {
-  req.usuario = { id: USUARIO_PRUEBA_ID, rol: "administracion" };
-  next();
-};
-
-const requireRol = (...roles: RolUsuario[]) => (_req: Request, _res: Response, next: NextFunction): void => {
-  next();
-};
-
-router.get("/", requireAuth, requireRol("compras", "servicios", "administracion"), controller.listar);
-router.get("/:id", requireAuth, requireRol("compras", "servicios", "administracion"), controller.obtener);
-router.post("/", requireAuth, requireRol("compras", "servicios"), controller.crear);
-router.put("/:id", requireAuth, requireRol("compras", "servicios"), controller.editar);
+router.get("/", permitirRoles("compras", "servicios", "administracion"), controller.listar);
+router.get("/:id", permitirRoles("compras", "servicios", "administracion"), controller.obtener);
+router.post("/", permitirRoles("compras", "servicios"), controller.crear);
+router.put("/:id", permitirRoles("compras", "servicios"), controller.editar);
 
 export default router;

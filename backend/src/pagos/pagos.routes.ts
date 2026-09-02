@@ -1,21 +1,14 @@
 // src/pagos/pagos.routes.ts
-import { Router, Request, Response, NextFunction } from "express";
+import { Router } from "express";
 import * as controller from "./pagos.controller";
+import { autenticar, permitirRoles } from "../middlewares/auth.middleware";
 
 const router = Router();
 
-const USUARIO_PRUEBA_ID = 1;
+// Contrato 3.2: todas las rutas exigen JWT salvo /auth/login.
+router.use(autenticar);
 
-// Mismo stub temporal que aprobaciones.routes.ts (Ficha 5.10 aún no existe).
-const requireAuth = (req: Request, _res: Response, next: NextFunction): void => {
-  const idHeader = Number(req.headers["x-usuario-id"]);
-  req.usuario = {
-    id: Number.isInteger(idHeader) && idHeader > 0 ? idHeader : USUARIO_PRUEBA_ID,
-    rol: "administracion",
-  };
-  next();
-};
-
-router.post("/:facturaId/pagos", requireAuth, controller.registrar);
+// Solo administracion registra pagos, según el contrato (avisado por Brayan).
+router.post("/:facturaId/pagos", permitirRoles("administracion"), controller.registrar);
 
 export default router;
