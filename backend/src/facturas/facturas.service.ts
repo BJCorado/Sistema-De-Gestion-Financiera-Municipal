@@ -1,5 +1,6 @@
-// src/facturas/facturas.service.js
-const prisma = require("../lib/prisma");
+// src/facturas/facturas.service.ts
+import { Factura, ModalidadCompra, EstadoOcr, Prisma } from "@prisma/client";
+import prisma from "../lib/prisma";
 
 // Constante institucional — nunca se toma del body (ver comentario del schema).
 const RECEPTOR = {
@@ -13,16 +14,45 @@ const CAMPOS_OBLIGATORIOS = [
   "monto_total",
   "fecha_vencimiento",
   "modalidad_compra",
-];
+] as const;
 
-class ErrorNegocio extends Error {
-  constructor(status, mensaje) {
+export class ErrorNegocio extends Error {
+  public readonly status: number;
+
+  constructor(status: number, mensaje: string) {
     super(mensaje);
+    this.name = "ErrorNegocio";
     this.status = status;
   }
 }
 
-function validarCamposObligatorios(body) {
+export type ColorSemaforo = "verde" | "amarillo" | "rojo";
+
+export interface Semaforo {
+  dias_restantes: number;
+  color: ColorSemaforo;
+}
+
+export interface FiltrosFactura {
+  page?: unknown;
+  limit?: unknown;
+  estado_pago?: unknown;
+  estado_aprobacion?: unknown;
+  estado_ocr?: unknown;
+  modalidad_compra?: unknown;
+  proveedor_id?: unknown;
+  q?: unknown;
+  orden?: unknown;
+}
+
+export interface ResultadoListado {
+  data: (Factura & Semaforo)[];
+  page: number;
+  limit: number;
+  total: number;
+}
+
+function validarCamposObligatorios(body: Record<string, unknown>): void {
   const faltantes = CAMPOS_OBLIGATORIOS.filter((campo) => !body[campo]);
   if (faltantes.length > 0) {
     throw new ErrorNegocio(
@@ -32,16 +62,16 @@ function validarCamposObligatorios(body) {
   }
 }
 
-function calcularSemaforo(fechaVencimiento) {
+export function calcularSemaforo(fechaVencimiento: Date | string): Semaforo {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
   const vencimiento = new Date(fechaVencimiento);
   vencimiento.setHours(0, 0, 0, 0);
 
   const msPorDia = 1000 * 60 * 60 * 24;
-  const diasRestantes = Math.round((vencimiento - hoy) / msPorDia);
+  const diasRestantes = Math.round((vencimiento.getTime() - hoy.getTime()) / msPorDia);
 
-  let color;
+  let color: ColorSemaforo;
   if (diasRestantes > 30) color = "verde";
   else if (diasRestantes >= 15) color = "amarillo";
   else color = "rojo";
@@ -49,7 +79,10 @@ function calcularSemaforo(fechaVencimiento) {
   return { dias_restantes: diasRestantes, color };
 }
 
-async function crearFactura(body, usuarioId) {
+export async function crearFactura(
+  body: Record<string, unknown>,
+  usuarioId: number
+): Promise<Factura> {
   validarCamposObligatorios(body);
 
   const proveedor = await prisma.proveedor.findUnique({
@@ -59,8 +92,8 @@ async function crearFactura(body, usuarioId) {
     throw new ErrorNegocio(404, "Proveedor no encontrado.");
   }
 
-  const nitEmisor = body.nit_emisor || proveedor.nit;
-  const nombreEmisor = body.nombre_emisor || proveedor.nombre;
+  const nitEmisor = (body.nit_emisor as string | undefined) || proveedor.nit;
+  const nombreEmisor = (body.nombre_emisor as string | undefined) || proveedor.nombre;
 
   const nitReceptor = RECEPTOR.nit;
   const nombreReceptor = RECEPTOR.nombre;
@@ -79,40 +112,41 @@ async function crearFactura(body, usuarioId) {
       nombreEmisor,
       nitReceptor,
       nombreReceptor,
-      serie: body.serie || null,
+      serie: (body.serie as string | undefined) || null,
       registradoPor: usuarioId,
-      numeroFactura: body.numero_factura,
+      numeroFactura: body.numero_factura as string,
       montoTotal,
       montoAbonado,
       saldoPendiente,
-      fechaEmision: body.fecha_emision ? new Date(body.fecha_emision) : new Date(),
-      fechaVencimiento: new Date(body.fecha_vencimiento),
+      fechaEmision: body.fecha_emision ? new Date(body.fecha_emision as string) : new Date(),
+      fechaVencimiento: new Date(body.fecha_vencimiento as string),
       estadoAprobacion,
-      estadoOcr: body.estado_ocr || "no_aplica",
-      modalidadCompra: body.modalidad_compra,
-      categoriaGasto: body.categoria_gasto || null,
-      adjuntoUrl: body.adjunto_url || null,
+      estadoOcr: (body.estado_ocr as EstadoOcr | undefined) || "no_aplica",
+      modalidadCompra: body.modalidad_compra as ModalidadCompra,
+      categoriaGasto: (body.categoria_gasto as string | undefined) || null,
+      adjuntoUrl: (body.adjunto_url as string | undefined) || null,
     },
   });
-
 
   return factura;
 }
 
-async function listarFacturas(query) {
+export async function listarFacturas(query: FiltrosFactura): Promise<ResultadoListado> {
   const page = Math.max(1, Number(query.page) || 1);
   const limit = Math.min(100, Number(query.limit) || 20);
   const skip = (page - 1) * limit;
 
-  const where = {};
-  if (query.estado_pago) where.estadoPago = query.estado_pago;
-  if (query.estado_aprobacion) where.estadoAprobacion = query.estado_aprobacion;
-  if (query.estado_ocr) where.estadoOcr = query.estado_ocr;
-  if (query.modalidad_compra) where.modalidadCompra = query.modalidad_compra;
+  const where: Prisma.FacturaWhereInput = {};
+  if (query.estado_pago) where.estadoPago = query.estado_pago as Prisma.FacturaWhereInput["estadoPago"];
+  if (query.estado_aprobacion)
+    where.estadoAprobacion = query.estado_aprobacion as Prisma.FacturaWhereInput["estadoAprobacion"];
+  if (query.estado_ocr) where.estadoOcr = query.estado_ocr as Prisma.FacturaWhereInput["estadoOcr"];
+  if (query.modalidad_compra)
+    where.modalidadCompra = query.modalidad_compra as Prisma.FacturaWhereInput["modalidadCompra"];
   if (query.proveedor_id) where.proveedorId = Number(query.proveedor_id);
-  if (query.q) where.numeroFactura = { contains: query.q };
+  if (query.q) where.numeroFactura = { contains: query.q as string };
 
-  const orderBy =
+  const orderBy: Prisma.FacturaOrderByWithRelationInput =
     query.orden === "antiguedad"
       ? { fechaVencimiento: "asc" }
       : { fechaVencimiento: "asc" };
@@ -130,10 +164,9 @@ async function listarFacturas(query) {
   return { data, page, limit, total };
 }
 
-/**
- * GET /facturas/:id
- */
-async function obtenerFactura(id) {
+export async function obtenerFactura(
+  id: string | number
+): Promise<Factura & Semaforo & { aprobacion_progreso: null }> {
   const factura = await prisma.factura.findUnique({ where: { id: Number(id) } });
   if (!factura) throw new ErrorNegocio(404, "Factura no encontrada.");
 
@@ -142,7 +175,10 @@ async function obtenerFactura(id) {
   return { ...factura, ...semaforo, aprobacion_progreso: null };
 }
 
-async function editarFactura(id, body) {
+export async function editarFactura(
+  id: string | number,
+  body: Record<string, unknown>
+): Promise<Factura> {
   const factura = await prisma.factura.findUnique({ where: { id: Number(id) } });
   if (!factura) throw new ErrorNegocio(404, "Factura no encontrada.");
 
@@ -161,24 +197,15 @@ async function editarFactura(id, body) {
   const actualizada = await prisma.factura.update({
     where: { id: factura.id },
     data: {
-      numeroFactura: body.numero_factura ?? factura.numeroFactura,
+      numeroFactura: (body.numero_factura as string | undefined) ?? factura.numeroFactura,
       montoTotal: body.monto_total ? Number(body.monto_total) : factura.montoTotal,
-      fechaEmision: body.fecha_emision ? new Date(body.fecha_emision) : factura.fechaEmision,
+      fechaEmision: body.fecha_emision ? new Date(body.fecha_emision as string) : factura.fechaEmision,
       fechaVencimiento: body.fecha_vencimiento
-        ? new Date(body.fecha_vencimiento)
+        ? new Date(body.fecha_vencimiento as string)
         : factura.fechaVencimiento,
-      categoriaGasto: body.categoria_gasto ?? factura.categoriaGasto,
+      categoriaGasto: (body.categoria_gasto as string | undefined) ?? factura.categoriaGasto,
     },
   });
 
   return actualizada;
 }
-
-module.exports = {
-  ErrorNegocio,
-  crearFactura,
-  listarFacturas,
-  obtenerFactura,
-  editarFactura,
-  calcularSemaforo,
-};
