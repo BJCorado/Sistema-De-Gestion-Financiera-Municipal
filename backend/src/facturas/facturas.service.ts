@@ -8,7 +8,6 @@ import {
 } from "@prisma/client";
 import prisma from "../lib/prisma";
 
-// Constante institucional: nunca se toma del body.
 const RECEPTOR = {
   nit: "6247520", // TODO: confirmar NIT real de la Municipalidad de Chiquimulilla
   nombre: "MUNICIPALIDAD DE CHIQUIMULILLA",

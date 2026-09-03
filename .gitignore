@@ -26,9 +26,6 @@ Thumbs.db
 .idea/
 *.swp
 
-# --- Claude Code (personal, no se comparte con el equipo) ---
-.claude/settings.local.json
-
 # --- Cobertura de pruebas ---
 coverage/
 

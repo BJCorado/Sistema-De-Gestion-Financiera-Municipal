@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import { ApiError } from "../../api/http";
+import { useAuth } from "../auth/useAuth";
 import { listarTodosProveedores } from "../proveedores/proveedores.api";
 import type { Proveedor } from "../proveedores/proveedores.types";
 import {
@@ -68,6 +69,8 @@ function getPageItems(current: number, total: number): Array<number | "left" | "
 }
 
 export function FacturasPage() {
+  const { usuario } = useAuth();
+  const canManage = usuario?.rol === "compras" || usuario?.rol === "servicios";
   const location = useLocation();
   const navigationMessage = (location.state as LocationState | null)?.message ?? "";
   const [searchInput, setSearchInput] = useState("");
@@ -189,10 +192,12 @@ export function FacturasPage() {
           <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Facturas</h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">Consulta y gestión de facturas municipales.</p>
         </div>
-        <Link to="/facturas/nueva" className="btn-primary shrink-0">
-          <span className="text-lg leading-none" aria-hidden="true">+</span>
-          Nueva factura
-        </Link>
+        {canManage && (
+          <Link to="/facturas/nueva" className="btn-primary shrink-0">
+            <span className="text-lg leading-none" aria-hidden="true">+</span>
+            Nueva factura
+          </Link>
+        )}
       </div>
 
       {success && (
@@ -296,7 +301,7 @@ export function FacturasPage() {
                   <td className="px-4 py-4"><EstadoOcrBadge estado={factura.estadoOcr} /></td>
                   <td className="px-4 py-4"><ModalidadBadge modalidad={factura.modalidadCompra} /></td>
                   <td className="px-4 py-4"><SemaforoBadge color={factura.color} dias={factura.dias_restantes} /></td>
-                  <td className="px-4 py-4"><div className="flex justify-end gap-1"><Link className="table-action" to={`/facturas/${factura.id}`} title="Ver factura" aria-label={`Ver factura ${factura.numeroFactura}`}>Ver</Link>{canEdit(factura) && <Link className="table-action" to={`/facturas/${factura.id}/editar`} title="Editar factura" aria-label={`Editar factura ${factura.numeroFactura}`}>Editar</Link>}</div></td>
+                  <td className="px-4 py-4"><div className="flex justify-end gap-1"><Link className="table-action" to={`/facturas/${factura.id}`} title="Ver factura" aria-label={`Ver factura ${factura.numeroFactura}`}>Ver</Link>{canManage && canEdit(factura) && <Link className="table-action" to={`/facturas/${factura.id}/editar`} title="Editar factura" aria-label={`Editar factura ${factura.numeroFactura}`}>Editar</Link>}</div></td>
                 </tr>
               ))}
             </tbody>

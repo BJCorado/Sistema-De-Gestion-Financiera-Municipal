@@ -3,6 +3,7 @@ import { Link, useLocation, useParams } from "react-router-dom";
 
 import { ApiError } from "../../api/http";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
+import { useAuth } from "../auth/useAuth";
 import { cambiarEstadoProveedor, obtenerProveedor } from "./proveedores.api";
 import { ProveedorStatusBadge, TipoProveedorBadge } from "./ProveedorStatusBadge";
 import type { Proveedor } from "./proveedores.types";
@@ -31,6 +32,8 @@ function formatDate(value: string) {
 }
 
 export function ProveedorDetailPage() {
+  const { usuario } = useAuth();
+  const canEdit = usuario?.rol === "compras" || usuario?.rol === "servicios";
   const { id: idParam } = useParams();
   const location = useLocation();
   const providerId = Number(idParam);
@@ -146,7 +149,7 @@ export function ProveedorDetailPage() {
           <p className="mt-2 text-sm leading-6 text-slate-600">Ficha administrativa del proveedor municipal.</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Link to={`/proveedores/${proveedor.id}/editar`} className="btn-primary">Editar</Link>
+          {canEdit && <Link to={`/proveedores/${proveedor.id}/editar`} className="btn-primary">Editar</Link>}
           <button
             type="button"
             className={proveedor.activo ? "btn-danger" : "btn-success"}

@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 
 import { ApiError } from "../../api/http";
+import { useAuth } from "../auth/useAuth";
 import { obtenerProveedor } from "../proveedores/proveedores.api";
 import type { Proveedor } from "../proveedores/proveedores.types";
 import {
@@ -46,6 +47,8 @@ function isSafeLink(value: string) {
 }
 
 export function FacturaDetailPage() {
+  const { usuario } = useAuth();
+  const canManage = usuario?.rol === "compras" || usuario?.rol === "servicios";
   const { id: idParam } = useParams();
   const location = useLocation();
   const facturaId = Number(idParam);
@@ -88,7 +91,7 @@ export function FacturaDetailPage() {
     <section className="mx-auto max-w-6xl">
       <div className="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div><Link to="/facturas" className="text-sm font-semibold text-sigefi-blue-700 hover:text-sigefi-blue-900">← Volver a facturas</Link><h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Detalle de factura</h1><p className="mt-2 text-sm text-slate-600">Información administrativa y financiera registrada.</p></div>
-        {canEdit(factura) && <Link to={`/facturas/${factura.id}/editar`} className="btn-primary">Editar factura</Link>}
+        {canManage && canEdit(factura) && <Link to={`/facturas/${factura.id}/editar`} className="btn-primary">Editar factura</Link>}
       </div>
 
       {success && <div className="mb-5 flex items-start justify-between gap-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800" role="status"><span>{success}</span><button type="button" className="font-bold text-green-700" aria-label="Cerrar mensaje" onClick={() => setSuccess("")}>×</button></div>}

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { ApiError } from "../../api/http";
+import { useAuth } from "../auth/useAuth";
 import {
   actualizarProveedor,
   crearProveedor,
@@ -88,12 +89,15 @@ function validateForm(form: FormState): FormErrors {
 }
 
 export function ProveedorFormPage() {
+  const { usuario } = useAuth();
+  const tipoPorRol: "" | TipoProveedor =
+    usuario?.rol === "compras" ? "bien" : usuario?.rol === "servicios" ? "servicio" : "";
   const { id: idParam } = useParams();
   const navigate = useNavigate();
   const editing = idParam !== undefined;
   const providerId = Number(idParam);
   const validId = !editing || (Number.isInteger(providerId) && providerId > 0);
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [form, setForm] = useState<FormState>({ ...EMPTY_FORM, tipo: tipoPorRol });
   const [errors, setErrors] = useState<FormErrors>({});
   const [generalError, setGeneralError] = useState("");
   const [loading, setLoading] = useState(editing);
@@ -254,11 +258,11 @@ export function ProveedorFormPage() {
             <legend className="text-base font-bold text-sigefi-blue-900">Información general</legend>
             <p className="mt-1 text-sm text-slate-500">Datos de identificación y clasificación del proveedor.</p>
             <div className="mt-5 grid gap-5 md:grid-cols-2">
-              <FormField label="Tipo de proveedor" required error={errors.tipo} hint={editing ? "La clasificación no puede modificarse después del registro." : undefined}>
+              <FormField label="Tipo de proveedor" required error={errors.tipo} hint={editing || tipoPorRol ? "La clasificación está definida por el rol y no puede modificarse." : undefined}>
                 <select
-                  className={`form-control ${errors.tipo ? "form-control-error" : ""} ${editing ? "bg-slate-100 text-slate-600" : ""}`}
+                  className={`form-control ${errors.tipo ? "form-control-error" : ""} ${editing || tipoPorRol ? "bg-slate-100 text-slate-600" : ""}`}
                   value={form.tipo}
-                  disabled={editing}
+                  disabled={editing || Boolean(tipoPorRol)}
                   onChange={(event) => updateField("tipo", event.target.value as FormState["tipo"])}
                 >
                   <option value="">Seleccione un tipo</option>

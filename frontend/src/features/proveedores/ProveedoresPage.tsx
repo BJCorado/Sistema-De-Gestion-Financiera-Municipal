@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 
 import { ApiError } from "../../api/http";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
+import { useAuth } from "../auth/useAuth";
 import { cambiarEstadoProveedor, listarProveedores } from "./proveedores.api";
 import { ProveedorStatusBadge, TipoProveedorBadge } from "./ProveedorStatusBadge";
 import type {
@@ -41,11 +42,15 @@ function getPageItems(current: number, total: number): Array<number | "ellipsis-
 }
 
 export function ProveedoresPage() {
+  const { usuario } = useAuth();
+  const scopedTipo: "" | TipoProveedor =
+    usuario?.rol === "compras" ? "bien" : usuario?.rol === "servicios" ? "servicio" : "";
+  const canManage = usuario?.rol === "compras" || usuario?.rol === "servicios";
   const location = useLocation();
   const navigationMessage = (location.state as LocationState | null)?.message ?? "";
   const [searchInput, setSearchInput] = useState("");
   const [query, setQuery] = useState("");
-  const [tipo, setTipo] = useState<"" | TipoProveedor>("");
+  const [tipo, setTipo] = useState<"" | TipoProveedor>(scopedTipo);
   const [estado, setEstado] = useState<EstadoFilter>("todos");
   const [page, setPage] = useState(1);
   const [result, setResult] = useState<PaginatedProveedores | null>(null);
@@ -105,7 +110,7 @@ export function ProveedoresPage() {
     setError("");
     setSearchInput("");
     setQuery("");
-    setTipo("");
+    setTipo(scopedTipo);
     setEstado("todos");
     setPage(1);
     setRefreshKey((value) => value + 1);
@@ -142,10 +147,12 @@ export function ProveedoresPage() {
             Consulta y gestión de proveedores municipales.
           </p>
         </div>
-        <Link to="/proveedores/nuevo" className="btn-primary shrink-0">
-          <span className="text-lg leading-none" aria-hidden="true">+</span>
-          Nuevo proveedor
-        </Link>
+        {canManage && (
+          <Link to="/proveedores/nuevo" className="btn-primary shrink-0">
+            <span className="text-lg leading-none" aria-hidden="true">+</span>
+            Nuevo proveedor
+          </Link>
+        )}
       </div>
 
       {success && (
@@ -185,6 +192,7 @@ export function ProveedoresPage() {
             <select
               className="form-control"
               value={tipo}
+              disabled={Boolean(scopedTipo)}
               onChange={(event) => {
                 setLoading(true);
                 setError("");
@@ -192,9 +200,9 @@ export function ProveedoresPage() {
                 setPage(1);
               }}
             >
-              <option value="">Todos</option>
-              <option value="bien">Bienes</option>
-              <option value="servicio">Servicios</option>
+              {!scopedTipo && <option value="">Todos</option>}
+              {usuario?.rol !== "servicios" && <option value="bien">Bienes</option>}
+              {usuario?.rol !== "compras" && <option value="servicio">Servicios</option>}
             </select>
           </label>
 
@@ -261,7 +269,7 @@ export function ProveedoresPage() {
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-1">
                       <Link className="table-action" to={`/proveedores/${proveedor.id}`} title="Ver proveedor" aria-label={`Ver proveedor ${proveedor.nombre}`}>Ver</Link>
-                      <Link className="table-action" to={`/proveedores/${proveedor.id}/editar`} title="Editar proveedor" aria-label={`Editar proveedor ${proveedor.nombre}`}>Editar</Link>
+                      {canManage && <Link className="table-action" to={`/proveedores/${proveedor.id}/editar`} title="Editar proveedor" aria-label={`Editar proveedor ${proveedor.nombre}`}>Editar</Link>}
                       <button
                         type="button"
                         className={proveedor.activo ? "table-action-danger" : "table-action-success"}

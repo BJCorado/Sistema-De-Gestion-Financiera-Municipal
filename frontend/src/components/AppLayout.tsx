@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 
+import { useAuth } from "../features/auth/useAuth";
+import { nombreRol } from "../features/auth/rutasPorRol";
+
 type NavigationIconName = "dashboard" | "providers" | "invoices";
 
 const navigation: Array<{
@@ -40,6 +43,13 @@ function NavigationIcon({ name }: { name: NavigationIconName }) {
 
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { usuario, logout } = useAuth();
+  const initials = usuario?.nombre
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase() || "SF";
 
   return (
     <div className="min-h-screen bg-sigefi-surface text-slate-800">
@@ -100,6 +110,13 @@ export function AppLayout() {
         <div className="mt-auto border-t border-white/10 px-5 py-5">
           <p className="text-xs leading-5 text-blue-200">Municipalidad de Chiquimulilla</p>
           <p className="text-[0.68rem] text-blue-300">Santa Rosa, Guatemala</p>
+          <button
+            type="button"
+            className="mt-3 text-xs font-semibold text-white hover:text-sigefi-yellow md:hidden"
+            onClick={logout}
+          >
+            Cerrar sesión
+          </button>
         </div>
       </aside>
 
@@ -128,14 +145,21 @@ export function AppLayout() {
 
           <div className="flex shrink-0 items-center gap-3">
             <div className="hidden text-right sm:block">
-              <p className="text-xs text-slate-500">Área actual</p>
-              <p className="text-sm font-semibold text-slate-800">Administración / Gerencia</p>
+              <p className="text-xs text-slate-500">{usuario?.nombre}</p>
+              <p className="text-sm font-semibold text-slate-800">
+                {usuario ? nombreRol[usuario.rol] : "SIGEFI"}
+              </p>
             </div>
-            <div className="grid size-9 place-items-center rounded-full bg-sigefi-blue-50 text-sigefi-blue-800" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="size-5">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M19 20a7 7 0 0 0-14 0m7-9a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
-              </svg>
+            <div className="grid size-9 place-items-center rounded-full bg-sigefi-blue-50 text-xs font-bold text-sigefi-blue-800" aria-hidden="true">
+              {initials}
             </div>
+            <button
+              type="button"
+              className="hidden text-sm font-semibold text-sigefi-blue-800 hover:text-sigefi-blue-950 md:inline"
+              onClick={logout}
+            >
+              Cerrar sesión
+            </button>
           </div>
         </header>
 

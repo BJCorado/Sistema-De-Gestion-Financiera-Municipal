@@ -8,9 +8,12 @@ import {
 } from "./facturas.service";
 
 function responderError(res: Response, error: unknown): Response {
-  const status = error instanceof ErrorNegocio ? error.status : 500;
-  const mensaje = error instanceof Error ? error.message : undefined;
-  return res.status(status).json({ error: mensaje });
+  if (error instanceof ErrorNegocio) {
+    return res.status(error.status).json({ error: error.message });
+  }
+
+  const mensaje = error instanceof Error ? error.message : "Error interno del servidor";
+  return res.status(500).json({ error: mensaje });
 }
 
 export async function crear(

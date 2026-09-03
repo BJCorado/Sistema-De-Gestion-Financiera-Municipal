@@ -8,6 +8,9 @@ interface ApiErrorBody {
   detalles?: ApiErrorDetail[];
 }
 
+const TOKEN_KEY = "sigefi_token";
+let onUnauthorized: (() => void) | null = null;
+
 const DEFAULT_MESSAGES: Record<number, string> = {
   400: "La solicitud contiene datos inválidos.",
   401: "No fue posible identificar el rol del usuario.",
@@ -32,10 +35,31 @@ export class ApiError extends Error {
   }
 }
 
+export function getToken(): string | null {
+  return window.localStorage.getItem(TOKEN_KEY);
+}
+
+export function setToken(token: string): void {
+  window.localStorage.setItem(TOKEN_KEY, token);
+}
+
+export function clearToken(): void {
+  window.localStorage.removeItem(TOKEN_KEY);
+}
+
+export function registerOnUnauthorized(handler: (() => void) | null): () => void {
+  onUnauthorized = handler;
+  return () => {
+    if (onUnauthorized === handler) onUnauthorized = null;
+  };
+}
+
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   headers.set("Accept", "application/json");
-  headers.set("x-rol-usuario", "administracion");
+
+  const token = getToken();
+  if (token) headers.set("Authorization", `Bearer ${token}`);
 
   if (init.body && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
@@ -56,6 +80,10 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
 
   if (!response.ok) {
     const errorBody = body as ApiErrorBody | null;
+    if (response.status === 401) {
+      clearToken();
+      onUnauthorized?.();
+    }
     throw new ApiError(
       response.status,
       (response.status < 500 ? errorBody?.error : undefined) ||
