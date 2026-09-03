@@ -2,6 +2,7 @@ import { apiFetch } from "../../api/http";
 import type {
   Factura,
   FacturaCreatePayload,
+  FacturaConSemaforo,
   FacturaFilters,
   FacturaUpdatePayload,
   PaginatedFacturas,
@@ -24,6 +25,20 @@ export function listarFacturas(filters: FacturaFilters) {
   if (filters.orden) params.set("orden", filters.orden);
 
   return apiFetch<PaginatedFacturas>(`${BASE_PATH}?${params.toString()}`);
+}
+
+export async function listarTodasFacturas(): Promise<FacturaConSemaforo[]> {
+  const facturas: FacturaConSemaforo[] = [];
+  let page = 1;
+
+  while (true) {
+    const response = await listarFacturas({ page, limit: 100 });
+    facturas.push(...response.data);
+    if (facturas.length >= response.total || response.data.length === 0) break;
+    page += 1;
+  }
+
+  return facturas;
 }
 
 export function obtenerFactura(id: number) {

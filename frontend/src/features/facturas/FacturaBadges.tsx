@@ -75,10 +75,21 @@ export function SemaforoBadge({ color, dias }: { color?: SemaforoColor; dias?: n
     amarillo: "bg-yellow-400",
     rojo: "bg-red-500",
   } satisfies Record<SemaforoColor, string>;
+  const label = {
+    verde: "Verde",
+    amarillo: "Amarillo",
+    rojo: "Rojo",
+  } satisfies Record<SemaforoColor, string>;
+  const plazo =
+    dias < 0
+      ? `Vencida hace ${Math.abs(dias)} ${Math.abs(dias) === 1 ? "día" : "días"}`
+      : dias === 0
+        ? "Vence hoy"
+        : `${dias} ${dias === 1 ? "día" : "días"}`;
   return (
     <span className={`inline-flex items-center gap-2 rounded-md px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${colors[color]}`}>
       <span className={`size-2 rounded-full ${dot[color]}`} aria-hidden="true" />
-      {dias} {Math.abs(dias) === 1 ? "día" : "días"}
+      {label[color]} — {plazo}
     </span>
   );
 }

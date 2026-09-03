@@ -45,6 +45,11 @@ export interface Factura {
   aprobacion_progreso?: unknown | null;
 }
 
+export interface FacturaConSemaforo extends Factura {
+  dias_restantes: number;
+  color: SemaforoColor;
+}
+
 export interface FacturaFilters {
   q?: string;
   estado_pago?: EstadoPago;
@@ -58,7 +63,7 @@ export interface FacturaFilters {
 }
 
 export interface PaginatedFacturas {
-  data: Factura[];
+  data: FacturaConSemaforo[];
   page: number;
   limit: number;
   total: number;
