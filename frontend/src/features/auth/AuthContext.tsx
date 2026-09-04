@@ -1,54 +1,37 @@
+import { useCallback, useEffect, useState, type ReactNode } from "react";
+
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
-import api, { clearToken, getToken, registerOn401, setToken } from "../../lib/api";
+  ApiError,
+  apiFetch,
+  clearToken,
+  getToken,
+  registerOnUnauthorized,
+  setToken,
+} from "../../api/http";
+import { AuthContext } from "./auth-context";
 import type { LoginResponse, Usuario } from "./types";
-
-interface AuthContextValue {
-  usuario: Usuario | null;
-  /** true mientras se valida un token guardado al cargar la app (GET /auth/me). */
-  cargando: boolean;
-  /** true mientras se procesa un intento de inicio de sesión. */
-  iniciandoSesion: boolean;
-  error: string | null;
-  login: (correo: string, password: string) => Promise<Usuario>;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [cargando, setCargando] = useState(true);
+  const [cargando, setCargando] = useState(() => Boolean(getToken()));
   const [iniciandoSesion, setIniciandoSesion] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const logout = useCallback(() => {
     clearToken();
     setUsuario(null);
+    setError(null);
   }, []);
 
-  // Si el backend rechaza el token en cualquier petición (401), cerramos sesión local.
-  useEffect(() => {
-    registerOn401(() => setUsuario(null));
-  }, []);
+  useEffect(() => registerOnUnauthorized(() => setUsuario(null)), []);
 
-  // Al cargar la app: si hay un token guardado de una sesión anterior, lo validamos
-  // contra GET /auth/me en vez de asumir que sigue siendo válido (puede haber expirado).
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      setCargando(false);
+    if (!getToken()) {
       return;
     }
-    api
-      .get<Usuario>("/auth/me")
-      .then((res) => setUsuario(res.data))
+
+    void apiFetch<Usuario>("/api/v1/auth/me")
+      .then((response) => setUsuario(response))
       .catch(() => clearToken())
       .finally(() => setCargando(false));
   }, []);
@@ -56,16 +39,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (correo: string, password: string) => {
     setIniciandoSesion(true);
     setError(null);
+
     try {
-      const res = await api.post<LoginResponse>("/auth/login", { correo, password });
-      setToken(res.data.token);
-      setUsuario(res.data.usuario);
-      return res.data.usuario;
-    } catch (err) {
-      const mensaje =
-        (axiosMessage(err) as string | undefined) ?? "No se pudo iniciar sesión. Intenta de nuevo.";
-      setError(mensaje);
-      throw err;
+      const response = await apiFetch<LoginResponse>("/api/v1/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ correo, password }),
+      });
+      setToken(response.token);
+      setUsuario(response.usuario);
+      return response.usuario;
+    } catch (requestError) {
+      const message =
+        requestError instanceof ApiError
+          ? requestError.message
+          : "No se pudo iniciar sesión. Intenta de nuevo.";
+      setError(message);
+      throw requestError;
     } finally {
       setIniciandoSesion(false);
     }
@@ -78,25 +67,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-function axiosMessage(err: unknown): string | undefined {
-  if (
-    typeof err === "object" &&
-    err !== null &&
-    "response" in err &&
-    typeof (err as { response?: { data?: { error?: string } } }).response?.data?.error ===
-      "string"
-  ) {
-    return (err as { response: { data: { error: string } } }).response.data.error;
-  }
-  return undefined;
-}
-
-export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth debe usarse dentro de <AuthProvider>");
-  }
-  return ctx;
 }

@@ -2,9 +2,9 @@ import type { RolUsuario } from "./types";
 
 /** A dónde redirigir justo después de iniciar sesión, según el rol del usuario. */
 export const rutaInicioPorRol: Record<RolUsuario, string> = {
-  compras: "/compras",
-  servicios: "/servicios",
-  administracion: "/administracion",
+  compras: "/",
+  servicios: "/",
+  administracion: "/",
 };
 
 export const nombreRol: Record<RolUsuario, string> = {

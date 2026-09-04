@@ -1,18 +1,12 @@
-// src/index.ts
 import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
+import aprobacionesRoutes from "./aprobaciones/aprobaciones.routes";
 import authRoutes from "./auth/auth.routes";
 import facturasRoutes from "./facturas/facturas.routes";
-import aprobacionesRoutes from "./aprobaciones/aprobaciones.routes";
 import pagosRoutes from "./pagos/pagos.routes";
 import proveedoresRoutes from "./proveedores/proveedores.routes";
 
 const app = express();
-
-// CORS: el frontend (Vite, puerto 5173 por defecto) corre en un origen distinto
-// al backend (puerto 3000), así que el navegador bloquea las peticiones si el
-// backend no responde explícitamente que las permite. Implementado a mano
-// (sin el paquete "cors") para no depender de una instalación nueva.
 const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:5173";
 
 app.use((req: Request, res: Response, next: NextFunction) => {

@@ -1,7 +1,234 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-sigefi-blue-50: #edf1fb;
+  --color-sigefi-blue-100: #dbeafe;
+  --color-sigefi-blue-700: #294ca7;
+  --color-sigefi-blue-800: #223e8c;
+  --color-sigefi-blue-900: #1f337c;
+  --color-sigefi-blue-950: #1b2a6b;
+  --color-sigefi-yellow: #f2c438;
+  --color-sigefi-green: #1e9e5b;
+  --color-sigefi-green-dark: #168248;
+  --color-sigefi-red: #d8394a;
+  --color-sigefi-surface: #eef1f8;
+}
+
+@media (min-width: 1024px) and (max-height: 800px) {
+  .login-brand-block {
+    padding-top: 0.75rem;
+    padding-bottom: 10.5rem;
+  }
+
+  .login-brand-logo {
+    height: 8.5rem;
+  }
+
+  .login-brand-title {
+    margin-top: 0;
+    font-size: 3.25rem;
+  }
+
+  .login-brand-subtitle {
+    margin-top: 0.625rem;
+    font-size: 1rem;
+  }
+
+  .login-brand-description {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.15rem;
+  }
+
+  .login-card {
+    max-width: 32rem;
+    padding: 1rem 2.25rem;
+  }
+
+  .login-lock {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .login-heading {
+    margin-top: 0.625rem;
+  }
+
+  .login-heading h1 {
+    font-size: 1.5rem;
+  }
+
+  .login-heading p {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.15rem;
+  }
+
+  .login-form {
+    margin-top: 0.875rem;
+  }
+
+  .login-form > :not(:last-child) {
+    margin-block-end: 0.625rem;
+  }
+
+  .login-form label {
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .login-input,
+  .login-submit {
+    min-height: 2.75rem;
+  }
+
+  .login-role {
+    margin-top: 0.75rem;
+    padding: 0.625rem 1rem;
+  }
+
+  .login-role-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .login-role p:first-child {
+    font-size: 0.875rem;
+  }
+
+  .login-role p:last-child {
+    margin-top: 0.125rem;
+    font-size: 0.75rem;
+    line-height: 1.15rem;
+  }
+
+  .login-footer {
+    min-height: 3.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+:root {
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: #1b2340;
+  background: #eef1f8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
 
 body {
-  @apply bg-slate-50 text-slate-900;
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+a {
+  cursor: pointer;
+}
+
+@layer components {
+  .panel {
+    @apply rounded-[14px] border border-[#e7eaf2] bg-white shadow-[0_6px_18px_-8px_rgba(20,26,60,0.16)];
+  }
+
+  .btn-secondary {
+    @apply inline-flex min-h-9 items-center justify-center rounded-lg border border-[#dfe4f0] bg-white px-4 py-2 text-xs font-semibold text-[#525b78] transition hover:bg-[#f5f7fb] disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply inline-flex min-h-9 items-center justify-center gap-2 rounded-lg bg-sigefi-blue-700 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-sigefi-blue-800 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-success {
+    @apply inline-flex min-h-9 items-center justify-center rounded-lg bg-sigefi-green px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-sigefi-green-dark disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-danger {
+    @apply inline-flex min-h-9 items-center justify-center rounded-lg bg-sigefi-red px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .form-label {
+    @apply mb-1.5 block text-[11px] font-semibold text-[#5c6480];
+  }
+
+  .form-control {
+    @apply block min-h-9 w-full rounded-lg border border-[#dfe4f0] bg-white px-3 py-2 text-xs text-[#1b2340] outline-none transition placeholder:text-[#a0a7ba] focus:border-sigefi-blue-700 focus:ring-2 focus:ring-sigefi-blue-100 disabled:cursor-not-allowed disabled:opacity-80;
+  }
+
+  .form-control-error {
+    @apply border-sigefi-red focus:border-sigefi-red focus:ring-red-100;
+  }
+
+  .field-error {
+    @apply mt-1.5 block text-xs font-medium text-sigefi-red;
+  }
+
+  .table-action {
+    @apply rounded-md px-2 py-1.5 text-[11px] font-semibold text-sigefi-blue-700 transition hover:bg-sigefi-blue-50 hover:text-sigefi-blue-900;
+  }
+
+  .table-action-danger {
+    @apply rounded px-2 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-50 hover:text-red-800;
+  }
+
+  .table-action-success {
+    @apply rounded px-2 py-1.5 text-xs font-semibold text-green-700 transition hover:bg-green-50 hover:text-green-800;
+  }
+
+  .pagination-button {
+    @apply min-h-9 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-45;
+  }
+
+  .pagination-number {
+    @apply grid size-9 place-items-center rounded-md border border-slate-300 bg-white text-xs font-semibold text-slate-700 transition hover:bg-slate-50;
+  }
+
+  .pagination-number-active {
+    @apply border-sigefi-blue-700 bg-sigefi-blue-700 text-white hover:bg-sigefi-blue-800;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-[10.5px] font-semibold;
+  }
+
+  .readonly-value {
+    @apply min-h-10 rounded-md border border-slate-200 bg-slate-100 px-3 py-2 text-sm capitalize text-slate-700;
+  }
+
+  .section-title {
+    @apply text-sm font-bold text-sigefi-blue-950;
+  }
+
+  .page-heading {
+    @apply mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between;
+  }
+
+  .page-kicker {
+    @apply text-[10px] font-semibold uppercase tracking-[0.12em] text-sigefi-blue-700;
+  }
+
+  .page-title {
+    @apply mt-1 text-[22px] font-bold tracking-tight text-[#1b2340];
+  }
+
+  .page-subtitle {
+    @apply mt-1.5 text-[13px] leading-5 text-[#5c6480];
+  }
 }

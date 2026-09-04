@@ -5,7 +5,7 @@ export default function NotFound() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-slate-600">
       <p className="text-2xl font-bold">404</p>
       <p>Esta página no existe.</p>
-      <Link to="/" className="text-navy underline">
+      <Link to="/" className="text-sigefi-blue-800 underline">
         Volver al inicio
       </Link>
     </div>

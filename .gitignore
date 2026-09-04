@@ -37,3 +37,7 @@ build/
 tmp/
 uploads/*
 !uploads/.gitkeep
+
+# --- Referencia para UI ---
+frontend/public/images/login-background.png
+frontend/public/images/login-reference.png

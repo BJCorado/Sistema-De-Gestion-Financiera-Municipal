@@ -1,54 +1,62 @@
-// src/facturas/facturas.controller.ts
 import { Request, Response } from "express";
-import * as service from "./facturas.service";
-import { ErrorNegocio } from "./facturas.service";
+import * as servicio from "./facturas.service";
+import {
+  CrearFacturaBody,
+  EditarFacturaBody,
+  ErrorNegocio,
+  FiltrosFactura,
+} from "./facturas.service";
 
-function obtenerId(req: Request): string {
-  const crudo = req.params.id;
-  return Array.isArray(crudo) ? crudo[0] : crudo;
-}
-
-function responderError(res: Response, error: unknown): void {
+function responderError(res: Response, error: unknown): Response {
   if (error instanceof ErrorNegocio) {
-    res.status(error.status).json({ error: error.message });
-    return;
+    return res.status(error.status).json({ error: error.message });
   }
+
   const mensaje = error instanceof Error ? error.message : "Error interno del servidor";
-  res.status(500).json({ error: mensaje });
+  return res.status(500).json({ error: mensaje });
 }
 
-export async function crear(req: Request, res: Response): Promise<void> {
+export async function crear(
+  req: Request<Record<string, never>, unknown, CrearFacturaBody>,
+  res: Response
+): Promise<void> {
   try {
-    const factura = await service.crearFactura(req.body, req.usuario!.id);
+    const factura = await servicio.crearFactura(req.body, req.usuario!.id);
     res.status(201).json(factura);
-  } catch (err) {
-    responderError(res, err);
+  } catch (error: unknown) {
+    responderError(res, error);
   }
 }
 
 export async function listar(req: Request, res: Response): Promise<void> {
   try {
-    const resultado = await service.listarFacturas(req.query as Record<string, unknown>);
+    const resultado = await servicio.listarFacturas(
+      req.query as FiltrosFactura,
+      req.usuario!.rol
+    );
     res.status(200).json(resultado);
-  } catch (err) {
-    responderError(res, err);
+  } catch (error: unknown) {
+    responderError(res, error);
   }
 }
 
-export async function obtener(req: Request, res: Response): Promise<void> {
+export async function obtener(req: Request<{ id: string }>, res: Response): Promise<void> {
   try {
-    const factura = await service.obtenerFactura(obtenerId(req));
+    const factura = await servicio.obtenerFactura(req.params.id, req.usuario!.rol);
     res.status(200).json(factura);
-  } catch (err) {
-    responderError(res, err);
+  } catch (error: unknown) {
+    responderError(res, error);
   }
 }
 
-export async function editar(req: Request, res: Response): Promise<void> {
+export async function editar(
+  req: Request<{ id: string }, unknown, EditarFacturaBody>,
+  res: Response
+): Promise<void> {
   try {
-    const factura = await service.editarFactura(obtenerId(req), req.body);
+    const factura = await servicio.editarFactura(req.params.id, req.body);
     res.status(200).json(factura);
-  } catch (err) {
-    responderError(res, err);
+  } catch (error: unknown) {
+    responderError(res, error);
   }
 }

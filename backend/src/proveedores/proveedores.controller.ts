@@ -10,11 +10,6 @@ interface CuerpoError {
   detalles?: ErrorCampo[];
 }
 
-/**
- * Rol del usuario. Temporal: hasta que exista POST /auth/login con JWT,
- * se toma de la cabecera x-rol-usuario. Cuando el middleware de autenticación
- * esté listo, esto pasa a ser req.usuario.rol y se elimina el fallback.
- */
 /** Rol del usuario autenticado. El middleware `autenticar` ya validó el JWT. */
 function obtenerRol(req: Request): RolUsuario {
   if (!req.usuario) {
