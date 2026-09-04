@@ -140,13 +140,13 @@ export function ProveedorDetailPage() {
 
   return (
     <section className="mx-auto max-w-5xl">
-      <div className="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
+      <div className="page-heading">
         <div>
-          <Link to="/proveedores" className="text-sm font-semibold text-sigefi-blue-700 hover:text-sigefi-blue-900">
+          <Link to="/proveedores" className="text-xs font-semibold text-sigefi-blue-700 hover:text-sigefi-blue-900">
             ← Volver a proveedores
           </Link>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Detalle de proveedor</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Ficha administrativa del proveedor municipal.</p>
+          <h1 className="page-title">Detalle de proveedor</h1>
+          <p className="page-subtitle">Ficha administrativa del proveedor municipal.</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           {canEdit && <Link to={`/proveedores/${proveedor.id}/editar`} className="btn-primary">Editar</Link>}
@@ -173,10 +173,10 @@ export function ProveedorDetailPage() {
 
       <article className="panel overflow-hidden">
         <div className="h-1 bg-sigefi-yellow" />
-        <div className="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="flex flex-col gap-4 border-b border-[#e7eaf2] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-sigefi-blue-700">Proveedor</p>
-            <h2 className="mt-1 text-xl font-bold text-slate-900">{proveedor.nombre}</h2>
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-sigefi-blue-700">Proveedor</p>
+            <h2 className="mt-1 text-base font-bold text-[#1b2340]">{proveedor.nombre}</h2>
           </div>
           <ProveedorStatusBadge activo={proveedor.activo} />
         </div>

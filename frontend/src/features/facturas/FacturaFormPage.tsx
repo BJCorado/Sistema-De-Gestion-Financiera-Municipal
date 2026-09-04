@@ -191,10 +191,12 @@ export function FacturaFormPage() {
 
   return (
     <section className="mx-auto max-w-6xl">
-      <div className="mb-6 border-b border-slate-200 pb-5">
-        <Link to={editing ? `/facturas/${facturaId}` : "/facturas"} className="text-sm font-semibold text-sigefi-blue-700 hover:text-sigefi-blue-900">← Volver a facturas</Link>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{editing ? "Editar factura" : "Registrar factura"}</h1>
-        <p className="mt-2 text-sm text-slate-600">{editing ? "Modifique únicamente los datos habilitados por el backend." : "Registre una factura asociada a un proveedor municipal."}</p>
+      <div className="page-heading">
+        <div>
+        <Link to={editing ? `/facturas/${facturaId}` : "/facturas"} className="text-xs font-semibold text-sigefi-blue-700 hover:text-sigefi-blue-900">← Volver a facturas</Link>
+        <h1 className="page-title">{editing ? "Editar factura" : "Registrar factura"}</h1>
+        <p className="page-subtitle">{editing ? "Modifique únicamente los datos habilitados por el backend." : "Registre una factura asociada a un proveedor municipal."}</p>
+        </div>
       </div>
 
       {generalError && <div className="mb-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">{generalError}</div>}
@@ -203,7 +205,7 @@ export function FacturaFormPage() {
       <form onSubmit={(event) => void handleSubmit(event)} noValidate>
         <div className="panel overflow-hidden">
           <div className="h-1 bg-sigefi-yellow" />
-          <fieldset className="border-b border-slate-200 p-5 sm:p-6" disabled={Boolean(editBlock)}>
+          <fieldset className="border-b border-[#e7eaf2] p-5 sm:p-6" disabled={Boolean(editBlock)}>
             <legend className="text-base font-bold text-sigefi-blue-900">Información de la factura</legend>
             <p className="mt-1 text-sm text-slate-500">Identificación, proveedor y modalidad de compra.</p>
             <div className="mt-5 grid gap-5 md:grid-cols-2">
@@ -220,7 +222,7 @@ export function FacturaFormPage() {
 
           {!editing && <fieldset className="p-5 sm:p-6"><legend className="text-base font-bold text-sigefi-blue-900">Referencia documental</legend><p className="mt-1 text-sm text-slate-500">No se realiza carga de archivos; el backend sólo admite una referencia URL.</p><div className="mt-5"><Field label="URL del adjunto" error={errors.adjunto_url}><input type="text" className={`form-control ${errors.adjunto_url ? "form-control-error" : ""}`} value={form.adjunto_url} maxLength={255} placeholder="https://..." onChange={(event) => updateField("adjunto_url", event.target.value)} /></Field></div></fieldset>}
 
-          <div className="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:justify-end sm:px-6"><button type="button" className="btn-secondary" disabled={saving} onClick={() => navigate(editing ? `/facturas/${facturaId}` : "/facturas")}>Cancelar</button><button type="submit" className="btn-success" disabled={saving || Boolean(editBlock)}>{saving ? "Guardando..." : editing ? "Guardar cambios" : "Guardar factura"}</button></div>
+          <div className="flex flex-col-reverse gap-3 border-t border-[#e7eaf2] bg-[#f8f9fc] px-5 py-4 sm:flex-row sm:justify-end sm:px-6"><button type="button" className="btn-secondary" disabled={saving} onClick={() => navigate(editing ? `/facturas/${facturaId}` : "/facturas")}>Cancelar</button><button type="submit" className="btn-success" disabled={saving || Boolean(editBlock)}>{saving ? "Guardando..." : editing ? "Guardar cambios" : "Guardar factura"}</button></div>
         </div>
       </form>
     </section>

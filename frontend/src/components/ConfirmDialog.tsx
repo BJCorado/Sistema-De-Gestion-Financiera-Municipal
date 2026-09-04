@@ -24,7 +24,7 @@ export function ConfirmDialog({
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 p-4" role="presentation">
       <div
-        className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-2xl"
+        className="w-full max-w-md rounded-2xl border border-[#e7eaf2] bg-white p-6 shadow-[0_18px_46px_-14px_rgba(13,15,31,0.32)]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
@@ -34,8 +34,8 @@ export function ConfirmDialog({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v4m0 4h.01M10.3 3.5 2.6 17a2 2 0 0 0 1.74 3h15.32a2 2 0 0 0 1.74-3L13.7 3.5a2 2 0 0 0-3.4 0Z" />
           </svg>
         </div>
-        <h2 id="confirm-dialog-title" className="text-lg font-bold text-slate-900">{title}</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+        <h2 id="confirm-dialog-title" className="text-base font-bold text-[#1b2340]">{title}</h2>
+        <p className="mt-2 text-xs leading-5 text-[#5c6480]">{description}</p>
         <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button type="button" className="btn-secondary" onClick={onCancel} disabled={busy}>
             Cancelar

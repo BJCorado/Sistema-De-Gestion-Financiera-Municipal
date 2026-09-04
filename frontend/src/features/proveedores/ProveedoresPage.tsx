@@ -139,12 +139,12 @@ export function ProveedoresPage() {
 
   return (
     <section className="mx-auto max-w-7xl">
-      <div className="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
+      <div className="page-heading">
         <div>
-          <p className="text-sm font-semibold text-sigefi-blue-700">Gestión administrativa</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Proveedores</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            Consulta y gestión de proveedores municipales.
+          <p className="page-kicker">Gestión administrativa</p>
+          <h1 className="page-title">Proveedores (consolidado)</h1>
+          <p className="page-subtitle">
+            Catálogo de proveedores municipales de bienes y servicios.
           </p>
         </div>
         {canManage && (
@@ -169,7 +169,7 @@ export function ProveedoresPage() {
         </div>
       )}
 
-      <div className="panel mb-5 p-4 sm:p-5">
+      <div className="panel mb-5 p-4">
         <div className="grid gap-4 lg:grid-cols-[minmax(16rem,1fr)_12rem_12rem_auto] lg:items-end">
           <label className="block">
             <span className="form-label">Búsqueda</span>
@@ -231,14 +231,14 @@ export function ProveedoresPage() {
       </div>
 
       <div className="panel overflow-hidden">
-        <div className="border-b border-slate-200 bg-white px-5 py-4">
-          <p className="text-sm font-bold text-slate-900">Listado de proveedores</p>
-          <p className="mt-1 text-xs text-slate-500">{result?.total ?? 0} proveedores registrados según los filtros aplicados.</p>
+        <div className="border-b border-[#e7eaf2] bg-white px-5 py-3.5">
+          <p className="text-[12.5px] font-bold text-[#1b2340]">Listado de proveedores</p>
+          <p className="mt-1 text-[10.5px] text-[#8891ab]">{result?.total ?? 0} proveedores registrados según los filtros aplicados.</p>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-[960px] w-full border-collapse text-left text-sm">
-            <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <table className="min-w-[960px] w-full border-collapse text-left text-xs">
+            <thead className="bg-[#f5f7fb] text-[10px] font-semibold uppercase tracking-wide text-[#6c7590]">
               <tr>
                 <th className="px-5 py-3">NIT</th>
                 <th className="px-5 py-3">Nombre del proveedor</th>
@@ -249,7 +249,7 @@ export function ProveedoresPage() {
                 <th className="px-5 py-3 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
+            <tbody className="divide-y divide-[#e7eaf2] bg-white">
               {loading && Array.from({ length: 5 }, (_, index) => (
                 <tr key={index} aria-hidden="true">
                   {Array.from({ length: 7 }, (_, cell) => (
@@ -259,7 +259,7 @@ export function ProveedoresPage() {
               ))}
 
               {!loading && result?.data.map((proveedor) => (
-                <tr key={proveedor.id} className="transition-colors hover:bg-sigefi-blue-50/40">
+                <tr key={proveedor.id} className="transition-colors hover:bg-[#f8f9fc]">
                   <td className="whitespace-nowrap px-5 py-4 font-medium text-slate-700">{proveedor.nit}</td>
                   <td className="px-5 py-4 font-semibold text-slate-900">{proveedor.nombre}</td>
                   <td className="px-5 py-4"><TipoProveedorBadge tipo={proveedor.tipo} /></td>

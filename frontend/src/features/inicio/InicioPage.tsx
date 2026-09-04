@@ -150,14 +150,16 @@ export function InicioPage() {
 
   return (
     <section className="mx-auto max-w-[100rem]">
-      <div className="mb-6 border-b border-slate-200 pb-5">
-        <p className="text-sm font-semibold text-sigefi-blue-700">Panel principal</p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+      <div className="page-heading">
+        <div>
+        <p className="page-kicker">Panel principal</p>
+        <h1 className="page-title">
           Dashboard
         </h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
+        <p className="page-subtitle">
           Resumen administrativo de vencimientos de facturas municipales.
         </p>
+        </div>
       </div>
 
       {error && (
@@ -189,17 +191,17 @@ export function InicioPage() {
           <article key={item.color} className={`panel border-l-4 p-5 ${item.borde}`}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className={`text-xs font-bold uppercase tracking-wide ${item.texto}`}>
+                <p className={`text-[10px] font-bold uppercase tracking-[0.1em] ${item.texto}`}>
                   {item.color}
                 </p>
-                <h2 className="mt-1 text-base font-bold text-slate-900">{item.titulo}</h2>
+                <h2 className="mt-1 text-sm font-bold text-[#1b2340]">{item.titulo}</h2>
               </div>
               <span className={`mt-1 size-3 shrink-0 rounded-full ${item.punto}`} aria-hidden="true" />
             </div>
             {loading ? (
               <div className="mt-4 h-9 w-24 animate-pulse rounded bg-slate-100" aria-hidden="true" />
             ) : (
-              <p className="mt-3 text-3xl font-bold text-slate-900">
+              <p className="mt-3 text-[28px] font-bold text-[#1b2340]">
                 {cantidades[item.color]}
                 <span className="ml-2 text-sm font-medium text-slate-500">
                   {cantidades[item.color] === 1 ? "factura" : "facturas"}
@@ -212,10 +214,10 @@ export function InicioPage() {
       </div>
 
       <div className="panel mt-5 overflow-hidden">
-        <div className="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-4 border-b border-[#e7eaf2] px-5 py-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-bold text-slate-900">Facturas por vencimiento</p>
-            <p className="mt-1 text-xs leading-5 text-slate-500">
+            <p className="text-[12.5px] font-bold text-[#1b2340]">Facturas por vencimiento</p>
+            <p className="mt-1 text-[10.5px] leading-5 text-[#8891ab]">
               Ordenadas desde las vencidas y más urgentes hasta las de mayor plazo.
             </p>
           </div>
@@ -244,8 +246,8 @@ export function InicioPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1120px] border-collapse text-left text-sm">
-            <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <table className="w-full min-w-[1120px] border-collapse text-left text-xs">
+            <thead className="bg-[#f5f7fb] text-[10px] font-semibold uppercase tracking-wide text-[#6c7590]">
               <tr>
                 <th className="px-4 py-3">Factura</th>
                 <th className="px-4 py-3">Proveedor</th>
@@ -257,7 +259,7 @@ export function InicioPage() {
                 <th className="px-4 py-3 text-right">Acción</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
+            <tbody className="divide-y divide-[#e7eaf2] bg-white">
               {loading &&
                 Array.from({ length: 5 }, (_, row) => (
                   <tr key={row} aria-hidden="true">
@@ -270,7 +272,7 @@ export function InicioPage() {
                 ))}
 
               {!loading && !error && filasVisibles.map((factura) => (
-                <tr key={factura.id} className="transition-colors hover:bg-sigefi-blue-50/40">
+                <tr key={factura.id} className="transition-colors hover:bg-[#f8f9fc]">
                   <td className="px-4 py-4 font-semibold text-slate-900">{factura.numeroFactura}</td>
                   <td className="px-4 py-4 text-slate-700">
                     {proveedoresPorId.get(factura.proveedorId) ?? `Proveedor #${factura.proveedorId}`}

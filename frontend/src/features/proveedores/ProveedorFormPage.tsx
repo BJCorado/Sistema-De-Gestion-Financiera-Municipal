@@ -230,18 +230,20 @@ export function ProveedorFormPage() {
 
   return (
     <section className="mx-auto max-w-5xl">
-      <div className="mb-6 border-b border-slate-200 pb-5">
-        <Link to="/proveedores" className="text-sm font-semibold text-sigefi-blue-700 hover:text-sigefi-blue-900">
+      <div className="page-heading">
+        <div>
+        <Link to="/proveedores" className="text-xs font-semibold text-sigefi-blue-700 hover:text-sigefi-blue-900">
           ← Volver a proveedores
         </Link>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h1 className="page-title">
           {editing ? "Editar proveedor" : "Nuevo proveedor"}
         </h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
+        <p className="page-subtitle">
           {editing
             ? "Actualice la información general y de contacto del proveedor."
             : "Registre un proveedor municipal de bienes o servicios."}
         </p>
+        </div>
       </div>
 
       {generalError && (
@@ -254,7 +256,7 @@ export function ProveedorFormPage() {
         <div className="panel overflow-hidden">
           <div className="h-1 bg-sigefi-yellow" />
 
-          <fieldset className="border-b border-slate-200 p-5 sm:p-6">
+          <fieldset className="border-b border-[#e7eaf2] p-5 sm:p-6">
             <legend className="text-base font-bold text-sigefi-blue-900">Información general</legend>
             <p className="mt-1 text-sm text-slate-500">Datos de identificación y clasificación del proveedor.</p>
             <div className="mt-5 grid gap-5 md:grid-cols-2">
@@ -344,7 +346,7 @@ export function ProveedorFormPage() {
             </div>
           </fieldset>
 
-          <div className="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
+          <div className="flex flex-col-reverse gap-3 border-t border-[#e7eaf2] bg-[#f8f9fc] px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
             <button
               type="button"
               className="btn-secondary"

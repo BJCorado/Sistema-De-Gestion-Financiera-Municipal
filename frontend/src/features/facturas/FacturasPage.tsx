@@ -186,11 +186,11 @@ export function FacturasPage() {
 
   return (
     <section className="mx-auto max-w-[100rem]">
-      <div className="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
+      <div className="page-heading">
         <div>
-          <p className="text-sm font-semibold text-sigefi-blue-700">Cuentas por pagar</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Facturas</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Consulta y gestión de facturas municipales.</p>
+          <p className="page-kicker">Cuentas por pagar</p>
+          <h1 className="page-title">Facturas (consolidado)</h1>
+          <p className="page-subtitle">Consulta y gestión de facturas municipales con su estado de vencimiento.</p>
         </div>
         {canManage && (
           <Link to="/facturas/nueva" className="btn-primary shrink-0">
@@ -218,7 +218,7 @@ export function FacturasPage() {
         </div>
       )}
 
-      <div className="panel mb-5 p-4 sm:p-5">
+      <div className="panel mb-5 p-4">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
           <label className="block md:col-span-2 xl:col-span-2">
             <span className="form-label">Búsqueda</span>
@@ -274,23 +274,23 @@ export function FacturasPage() {
       </div>
 
       <div className="panel overflow-hidden">
-        <div className="border-b border-slate-200 px-5 py-4">
-          <p className="text-sm font-bold text-slate-900">Listado de facturas</p>
-          <p className="mt-1 text-xs text-slate-500">{result?.total ?? 0} facturas según los filtros aplicados.</p>
+        <div className="border-b border-[#e7eaf2] px-5 py-3.5">
+          <p className="text-[12.5px] font-bold text-[#1b2340]">Listado de facturas</p>
+          <p className="mt-1 text-[10.5px] text-[#8891ab]">{result?.total ?? 0} facturas según los filtros aplicados.</p>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1480px] border-collapse text-left text-sm">
-            <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <table className="w-full min-w-[1480px] border-collapse text-left text-xs">
+            <thead className="bg-[#f5f7fb] text-[10px] font-semibold uppercase tracking-wide text-[#6c7590]">
               <tr>
                 <th className="px-4 py-3">Factura</th><th className="px-4 py-3">Proveedor</th><th className="px-4 py-3">Monto</th><th className="px-4 py-3">Emisión</th><th className="px-4 py-3">Vencimiento</th><th className="px-4 py-3">Aprobación</th><th className="px-4 py-3">Pago</th><th className="px-4 py-3">OCR</th><th className="px-4 py-3">Modalidad</th><th className="px-4 py-3">Días restantes</th><th className="px-4 py-3 text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
+            <tbody className="divide-y divide-[#e7eaf2] bg-white">
               {loading && Array.from({ length: 5 }, (_, row) => (
                 <tr key={row} aria-hidden="true">{Array.from({ length: 11 }, (_, cell) => <td key={cell} className="px-4 py-4"><span className="block h-4 animate-pulse rounded bg-slate-100" /></td>)}</tr>
               ))}
               {!loading && result?.data.map((factura) => (
-                <tr key={factura.id} className="transition-colors hover:bg-sigefi-blue-50/40">
+                <tr key={factura.id} className="transition-colors hover:bg-[#f8f9fc]">
                   <td className="px-4 py-4 font-semibold text-slate-900">{factura.numeroFactura}</td>
                   <td className="px-4 py-4 text-slate-700">{providerNames.get(factura.proveedorId) ?? `Proveedor #${factura.proveedorId}`}</td>
                   <td className="whitespace-nowrap px-4 py-4 font-semibold text-slate-800">{formatCurrency(factura.montoTotal)}</td>

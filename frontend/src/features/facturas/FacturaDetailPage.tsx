@@ -89,8 +89,8 @@ export function FacturaDetailPage() {
 
   return (
     <section className="mx-auto max-w-6xl">
-      <div className="mb-6 flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
-        <div><Link to="/facturas" className="text-sm font-semibold text-sigefi-blue-700 hover:text-sigefi-blue-900">← Volver a facturas</Link><h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Detalle de factura</h1><p className="mt-2 text-sm text-slate-600">Información administrativa y financiera registrada.</p></div>
+      <div className="page-heading">
+        <div><Link to="/facturas" className="text-xs font-semibold text-sigefi-blue-700 hover:text-sigefi-blue-900">← Volver a facturas</Link><h1 className="page-title">Detalle de factura</h1><p className="page-subtitle">Información administrativa y financiera registrada.</p></div>
         {canManage && canEdit(factura) && <Link to={`/facturas/${factura.id}/editar`} className="btn-primary">Editar factura</Link>}
       </div>
 
@@ -99,7 +99,7 @@ export function FacturaDetailPage() {
 
       <article className="panel overflow-hidden">
         <div className="h-1 bg-sigefi-yellow" />
-        <div className="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6"><div><p className="text-xs font-semibold uppercase tracking-wide text-sigefi-blue-700">Factura</p><h2 className="mt-1 text-xl font-bold text-slate-900">{factura.numeroFactura}</h2><p className="mt-1 text-sm text-slate-500">{proveedor?.nombre ?? `Proveedor #${factura.proveedorId}`}</p></div><SemaforoBadge color={factura.color} dias={factura.dias_restantes} /></div>
+        <div className="flex flex-col gap-4 border-b border-[#e7eaf2] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"><div><p className="text-[10px] font-semibold uppercase tracking-wide text-sigefi-blue-700">Factura</p><h2 className="mt-1 text-base font-bold text-[#1b2340]">{factura.numeroFactura}</h2><p className="mt-1 text-xs text-[#8891ab]">{proveedor?.nombre ?? `Proveedor #${factura.proveedorId}`}</p></div><SemaforoBadge color={factura.color} dias={factura.dias_restantes} /></div>
 
         <section className="border-b border-slate-200 p-5 sm:p-6"><h3 className="section-title">Documento y proveedor</h3><dl className="mt-4 grid sm:grid-cols-2 sm:gap-x-10 sm:gap-y-7 lg:grid-cols-3"><DetailItem label="Proveedor">{proveedor?.nombre ?? `Proveedor #${factura.proveedorId}`}</DetailItem><DetailItem label="NIT del proveedor">{proveedor?.nit ?? factura.nitEmisor}</DetailItem><DetailItem label="Número de factura">{factura.numeroFactura}</DetailItem><DetailItem label="Serie">{factura.serie || "—"}</DetailItem><DetailItem label="Modalidad"><ModalidadBadge modalidad={factura.modalidadCompra} /></DetailItem><DetailItem label="Categoría de gasto">{factura.categoriaGasto || "—"}</DetailItem></dl></section>
 
