@@ -1,4 +1,26 @@
-import { calcularSemaforo } from "./facturas.service";
+import prisma from "../lib/prisma";
+import {
+  calcularSemaforo,
+  construirAlcancePorRol,
+  ErrorNegocio,
+  listarFacturas,
+  obtenerFactura,
+} from "./facturas.service";
+
+jest.mock("../lib/prisma", () => ({
+  __esModule: true,
+  default: {
+    factura: {
+      count: jest.fn(),
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+    },
+  },
+}));
+
+const findFirstMock = jest.mocked(prisma.factura.findFirst);
+const countMock = jest.mocked(prisma.factura.count);
+const findManyMock = jest.mocked(prisma.factura.findMany);
 
 function fechaEn(dias: number): Date {
   const fecha = new Date();
@@ -39,6 +61,71 @@ describe("calcularSemaforo (HU-05)", () => {
       color: colorEsperado,
     });
   });
+});
+
+describe("alcance de Facturas por rol", () => {
+  beforeEach(() => {
+    countMock.mockReset();
+    findManyMock.mockReset();
+    findFirstMock.mockReset();
+  });
+
+  test("administracion no restringe el tipo de proveedor", () => {
+    expect(construirAlcancePorRol("administracion")).toEqual({});
+  });
+
+  test("compras limita las consultas a proveedores de bienes", () => {
+    expect(construirAlcancePorRol("compras")).toEqual({
+      proveedor: { tipo: "bien" },
+    });
+  });
+
+  test("servicios limita las consultas a proveedores de servicios", () => {
+    expect(construirAlcancePorRol("servicios")).toEqual({
+      proveedor: { tipo: "servicio" },
+    });
+  });
+
+  test.each([
+    ["administracion", {}],
+    ["compras", { proveedor: { tipo: "bien" } }],
+    ["servicios", { proveedor: { tipo: "servicio" } }],
+  ] as const)("el listado para %s aplica el alcance esperado", async (rol, where) => {
+    countMock.mockResolvedValue(0);
+    findManyMock.mockResolvedValue([]);
+
+    await expect(listarFacturas({}, rol)).resolves.toEqual({
+      data: [],
+      page: 1,
+      limit: 20,
+      total: 0,
+    });
+    expect(countMock).toHaveBeenCalledWith({ where });
+    expect(findManyMock).toHaveBeenCalledWith({
+      where,
+      orderBy: { fechaVencimiento: "asc" },
+      skip: 0,
+      take: 20,
+    });
+  });
+
+  test.each([
+    ["compras", "bien"],
+    ["servicios", "servicio"],
+  ] as const)(
+    "%s no puede obtener el detalle de una factura ajena a su tipo",
+    async (rol, tipo) => {
+      findFirstMock.mockResolvedValue(null);
+
+      await expect(obtenerFactura(25, rol)).rejects.toMatchObject<Partial<ErrorNegocio>>({
+        status: 404,
+        message: "Factura no encontrada.",
+      });
+      expect(findFirstMock).toHaveBeenCalledWith({
+        where: { id: 25, proveedor: { tipo } },
+      });
+    }
+  );
 });
 
 // TODO (con Prisma mockeado):

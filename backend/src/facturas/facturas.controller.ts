@@ -30,7 +30,10 @@ export async function crear(
 
 export async function listar(req: Request, res: Response): Promise<void> {
   try {
-    const resultado = await servicio.listarFacturas(req.query as FiltrosFactura);
+    const resultado = await servicio.listarFacturas(
+      req.query as FiltrosFactura,
+      req.usuario!.rol
+    );
     res.status(200).json(resultado);
   } catch (error: unknown) {
     responderError(res, error);
@@ -39,7 +42,7 @@ export async function listar(req: Request, res: Response): Promise<void> {
 
 export async function obtener(req: Request<{ id: string }>, res: Response): Promise<void> {
   try {
-    const factura = await servicio.obtenerFactura(req.params.id);
+    const factura = await servicio.obtenerFactura(req.params.id, req.usuario!.rol);
     res.status(200).json(factura);
   } catch (error: unknown) {
     responderError(res, error);

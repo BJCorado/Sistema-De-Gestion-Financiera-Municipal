@@ -5,6 +5,8 @@ import {
   Factura,
   ModalidadCompra,
   Prisma,
+  RolUsuario,
+  TipoProveedor,
 } from "@prisma/client";
 import prisma from "../lib/prisma";
 
@@ -83,6 +85,21 @@ export class ErrorNegocio extends Error {
   }
 }
 
+const TIPO_PROVEEDOR_POR_ROL: Record<RolUsuario, TipoProveedor | null> = {
+  compras: TipoProveedor.bien,
+  servicios: TipoProveedor.servicio,
+  administracion: null,
+};
+
+/**
+ * Limita las facturas al tipo de proveedor visible para el rol autenticado.
+ * Administración no recibe una condición adicional.
+ */
+export function construirAlcancePorRol(rol: RolUsuario): Prisma.FacturaWhereInput {
+  const tipoProveedor = TIPO_PROVEEDOR_POR_ROL[rol];
+  return tipoProveedor ? { proveedor: { tipo: tipoProveedor } } : {};
+}
+
 function validarCamposObligatorios(body: CrearFacturaBody): void {
   const faltantes = CAMPOS_OBLIGATORIOS.filter((campo) => !body[campo]);
   if (faltantes.length > 0) {
@@ -155,12 +172,15 @@ export async function crearFactura(
   });
 }
 
-export async function listarFacturas(query: FiltrosFactura): Promise<ListadoFacturas> {
+export async function listarFacturas(
+  query: FiltrosFactura,
+  rol: RolUsuario
+): Promise<ListadoFacturas> {
   const page = Math.max(1, Number(query.page) || 1);
   const limit = Math.min(100, Number(query.limit) || 20);
   const skip = (page - 1) * limit;
 
-  const where: Prisma.FacturaWhereInput = {};
+  const where: Prisma.FacturaWhereInput = construirAlcancePorRol(rol);
   if (query.estado_pago) where.estadoPago = query.estado_pago;
   if (query.estado_aprobacion) where.estadoAprobacion = query.estado_aprobacion;
   if (query.estado_ocr) where.estadoOcr = query.estado_ocr;
@@ -186,8 +206,13 @@ export async function listarFacturas(query: FiltrosFactura): Promise<ListadoFact
   return { data, page, limit, total };
 }
 
-export async function obtenerFactura(id: number | string): Promise<DetalleFactura> {
-  const factura = await prisma.factura.findUnique({ where: { id: Number(id) } });
+export async function obtenerFactura(
+  id: number | string,
+  rol: RolUsuario
+): Promise<DetalleFactura> {
+  const factura = await prisma.factura.findFirst({
+    where: { id: Number(id), ...construirAlcancePorRol(rol) },
+  });
   if (!factura) throw new ErrorNegocio(404, "Factura no encontrada.");
 
   return {
