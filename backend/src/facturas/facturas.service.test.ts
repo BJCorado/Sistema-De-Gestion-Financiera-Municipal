@@ -2,6 +2,7 @@ import prisma from "../lib/prisma";
 import {
   calcularSemaforo,
   construirAlcancePorRol,
+  crearFactura,
   ErrorNegocio,
   listarFacturas,
   obtenerFactura,
@@ -14,6 +15,10 @@ jest.mock("../lib/prisma", () => ({
       count: jest.fn(),
       findMany: jest.fn(),
       findFirst: jest.fn(),
+      create: jest.fn(),
+    },
+    proveedor: {
+      findUnique: jest.fn(),
     },
   },
 }));
@@ -21,6 +26,8 @@ jest.mock("../lib/prisma", () => ({
 const findFirstMock = jest.mocked(prisma.factura.findFirst);
 const countMock = jest.mocked(prisma.factura.count);
 const findManyMock = jest.mocked(prisma.factura.findMany);
+const createMock = jest.mocked(prisma.factura.create);
+const proveedorFindUniqueMock = jest.mocked(prisma.proveedor.findUnique);
 
 function fechaEn(dias: number): Date {
   const fecha = new Date();
@@ -128,8 +135,91 @@ describe("alcance de Facturas por rol", () => {
   );
 });
 
+const CUERPO_VALIDO = {
+  proveedor_id: 1,
+  numero_factura: "F-001",
+  monto_total: 1000,
+  fecha_vencimiento: "2026-12-01",
+  modalidad_compra: "cotizacion" as const,
+};
+
+const PROVEEDOR_BASE = {
+  activo: true,
+  contacto: null,
+  correo: null,
+  creadoEn: new Date(),
+  direccion: null,
+  telefono: null,
+};
+const PROVEEDOR_BIEN = { ...PROVEEDOR_BASE, id: 1, nit: "12345678", nombre: "Proveedor de Bienes", tipo: "bien" as const };
+const PROVEEDOR_SERVICIO = { ...PROVEEDOR_BASE, id: 2, nit: "87654321", nombre: "Proveedor de Servicios", tipo: "servicio" as const };
+
+describe("crearFactura — diagnóstico QA 04/09/2026 (Cesar González)", () => {
+  beforeEach(() => {
+    proveedorFindUniqueMock.mockReset();
+    createMock.mockReset();
+  });
+
+  // SPR1-CONTRATO01
+  test("DEF-01: rol servicios + proveedor tipo bien -> 403, no crea la factura", async () => {
+    proveedorFindUniqueMock.mockResolvedValue(PROVEEDOR_BIEN);
+
+    await expect(
+      crearFactura(CUERPO_VALIDO, 1, "servicios")
+    ).rejects.toMatchObject<Partial<ErrorNegocio>>({ status: 403 });
+    expect(createMock).not.toHaveBeenCalled();
+  });
+
+  // SPR1-RN08
+  test("DEF-02: monto_total = -500 -> 400, no accede a persistencia", async () => {
+    await expect(
+      crearFactura({ ...CUERPO_VALIDO, monto_total: -500 }, 1, "compras")
+    ).rejects.toMatchObject<Partial<ErrorNegocio>>({ status: 400 });
+    expect(proveedorFindUniqueMock).not.toHaveBeenCalled();
+    expect(createMock).not.toHaveBeenCalled();
+  });
+
+  // SPR1-RN09
+  test("DEF-03: fecha_vencimiento inválida -> 400, no crea la factura", async () => {
+    await expect(
+      crearFactura({ ...CUERPO_VALIDO, fecha_vencimiento: "no-es-una-fecha" }, 1, "compras")
+    ).rejects.toMatchObject<Partial<ErrorNegocio>>({ status: 400 });
+    expect(proveedorFindUniqueMock).not.toHaveBeenCalled();
+    expect(createMock).not.toHaveBeenCalled();
+  });
+
+  // Regresión válida
+  test("rol, proveedor, monto y fecha válidos -> crea la factura (201)", async () => {
+    proveedorFindUniqueMock.mockResolvedValue(PROVEEDOR_SERVICIO);
+    createMock.mockResolvedValue({ id: 99 } as never);
+
+    await expect(crearFactura(CUERPO_VALIDO, 1, "servicios")).resolves.toEqual({ id: 99 });
+    expect(createMock).toHaveBeenCalledTimes(1);
+  });
+
+  test("modalidad_compra = baja_cuantia -> estado_aprobacion 'aprobada'", async () => {
+    proveedorFindUniqueMock.mockResolvedValue(PROVEEDOR_BIEN);
+    createMock.mockResolvedValue({ id: 1 } as never);
+
+    await crearFactura({ ...CUERPO_VALIDO, modalidad_compra: "baja_cuantia" }, 1, "compras");
+
+    expect(createMock).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ estadoAprobacion: "aprobada" }) })
+    );
+  });
+
+  test("las otras modalidades -> estado_aprobacion 'pendiente'", async () => {
+    proveedorFindUniqueMock.mockResolvedValue(PROVEEDOR_BIEN);
+    createMock.mockResolvedValue({ id: 1 } as never);
+
+    await crearFactura(CUERPO_VALIDO, 1, "compras");
+
+    expect(createMock).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ estadoAprobacion: "pendiente" }) })
+    );
+  });
+});
+
 // TODO (con Prisma mockeado):
-// - crearFactura(): modalidad_compra = "baja_cuantia" -> estado_aprobacion "aprobada"
-// - crearFactura(): las otras 3 modalidades -> estado_aprobacion "pendiente"
 // - editarFactura(): rechaza 409 si la factura ya tiene pagos registrados (RF-17)
 // - editarFactura(): rechaza 409 si la factura ya está aprobada

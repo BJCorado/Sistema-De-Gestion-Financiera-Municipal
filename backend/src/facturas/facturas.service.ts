@@ -128,14 +128,38 @@ export function calcularSemaforo(fechaVencimiento: Date | string): Semaforo {
 
 export async function crearFactura(
   body: CrearFacturaBody,
-  usuarioId: number
+  usuarioId: number,
+  rolUsuario: RolUsuario
 ): Promise<Factura> {
   validarCamposObligatorios(body);
+
+  // DEF-02 (diagnóstico QA 04/09): el chequeo de "campos obligatorios" es un
+  // truthy check y no detecta montos negativos (-500 es verdadero en JS).
+  const montoTotal = Number(body.monto_total);
+  if (!Number.isFinite(montoTotal) || montoTotal <= 0) {
+    throw new ErrorNegocio(400, "monto_total debe ser un número mayor a 0.");
+  }
+
+  // DEF-03: valida la fecha antes de que un Invalid Date llegue a Prisma.
+  const fechaVencimiento = new Date(body.fecha_vencimiento!);
+  if (Number.isNaN(fechaVencimiento.getTime())) {
+    throw new ErrorNegocio(400, "fecha_vencimiento no es una fecha válida (use YYYY-MM-DD).");
+  }
 
   const proveedor = await prisma.proveedor.findUnique({
     where: { id: Number(body.proveedor_id) },
   });
   if (!proveedor) throw new ErrorNegocio(404, "Proveedor no encontrado.");
+
+  // DEF-01: el rol solo puede facturar al tipo de proveedor que le corresponde
+  // (mismo TIPO_PROVEEDOR_POR_ROL que ya usan listarFacturas/obtenerFactura).
+  const tipoPermitido = TIPO_PROVEEDOR_POR_ROL[rolUsuario] ?? null;
+  if (tipoPermitido && proveedor.tipo !== tipoPermitido) {
+    throw new ErrorNegocio(
+      403,
+      `Su rol solo puede facturar a proveedores de tipo "${tipoPermitido}"`
+    );
+  }
 
   const nitEmisor = body.nit_emisor || proveedor.nit;
   const nombreEmisor = body.nombre_emisor || proveedor.nombre;
@@ -144,7 +168,6 @@ export async function crearFactura(
       ? EstadoAprobacion.aprobada
       : EstadoAprobacion.pendiente;
 
-  const montoTotal = Number(body.monto_total);
   const montoAbonado = 0;
   const saldoPendiente = montoTotal - montoAbonado;
 
@@ -162,7 +185,7 @@ export async function crearFactura(
       montoAbonado,
       saldoPendiente,
       fechaEmision: body.fecha_emision ? new Date(body.fecha_emision) : new Date(),
-      fechaVencimiento: new Date(body.fecha_vencimiento!),
+      fechaVencimiento,
       estadoAprobacion,
       estadoOcr: body.estado_ocr || EstadoOcr.no_aplica,
       modalidadCompra: body.modalidad_compra!,

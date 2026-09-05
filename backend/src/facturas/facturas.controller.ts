@@ -21,7 +21,7 @@ export async function crear(
   res: Response
 ): Promise<void> {
   try {
-    const factura = await servicio.crearFactura(req.body, req.usuario!.id);
+    const factura = await servicio.crearFactura(req.body, req.usuario!.id, req.usuario!.rol);
     res.status(201).json(factura);
   } catch (error: unknown) {
     responderError(res, error);
